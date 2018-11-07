@@ -4,8 +4,8 @@ import { activate } from "./activate";
 
 const observable: Observable<number> = from([1, 2, 3, 4])
     .pipe(
-        filter((num) => num % 2 === 0),
-        map((num) => num * 2)
+        map((num) => num * 2),
+        filter((num) => num % 2 === 0)
     );
 
 $("<button>pipe</button>")

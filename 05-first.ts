@@ -1,5 +1,5 @@
 import { from, Observable } from "rxjs";
-import { first, map } from "rxjs/operators";
+import { first, map, filter } from "rxjs/operators";
 import { activate } from "./activate";
 
 const parent: Observable<number> = from([1, 2, 3, 4]);
@@ -12,7 +12,8 @@ const child1: Observable<string> = parent
 
 const child2: Observable<string> = parent
     .pipe(
-        first((num: number) => num % 2 === 0),
+        // filter((num) => num % 2 === 0),
+        first((num) => num % 2 === 0),
         map((value) => `Child 2: ${value}`)
     );
 
