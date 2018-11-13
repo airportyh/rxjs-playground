@@ -18,9 +18,9 @@ import "./12-throttle";
 import "./13-debounce";
 // import "./exercise";
 
-$("#clear-transcript").on("click", () => {
-    $("#transcript").html("");
-});
+// $("#clear-transcript").on("click", () => {
+//     $("#transcript").html("");
+// });
 
-$("#deactivate").on("click", () => deactivate());
+// $("#deactivate").on("click", () => deactivate());
 
