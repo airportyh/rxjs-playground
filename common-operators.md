@@ -7,6 +7,7 @@
 * distinctUntilChanged
 * combineLatest
 * subscribe / unsubscribe
+* merge / combine Latest
 
 * Observable.create
 * ajax calls / cold observables / switchMap / share / replay

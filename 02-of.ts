@@ -1,10 +1,11 @@
-import { interval } from "rxjs";
+import { of, Observable } from "rxjs";
 import { activate } from "./activate";
 
-const observable = interval(1000);
+const observable: Observable<number> = of(1);
 
-$("<button>interval</button>")
+$("<button>02-of</button>")
     .appendTo("#buttons")
     .on("click", () => {
         activate(observable);
     });
+

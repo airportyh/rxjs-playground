@@ -6,15 +6,15 @@ const observable: Observable<number> = interval(500);
 
 let subscription: Subscription;
 
-$("<button>subscribe</button>")
+$("<button>01-subscribe</button>")
     .appendTo("#buttons")
     .on("click", () => {
         subscription = observable.subscribe((value) => {
-            $("#transcript").append("TOBY SEZ: " + value + "<br>");
+            $("#transcript").append("HELLO: " + value + "<br>");
         });
     });
 
-$("<button>Unsubscribe</button>")
+$("<button>01-unsubscribe</button>")
     .appendTo("#buttons")
     .on("click", () => {
         subscription.unsubscribe();

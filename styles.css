@@ -28,8 +28,11 @@ body {
 }
 
 .value {
-    color: green;
+    color: black;
     font-weight: bold;
+    padding: 0 5px;
+    border: 1px solid black;
+    border-radius: 5px;
 }
 
 #toolbar {
