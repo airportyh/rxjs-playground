@@ -22,17 +22,26 @@ const subscriptions = new Subscriptions();
 let timeline: AnimatedTimeline;
 
 export function activate(observable: Observable<any>): void {
-    startAnimatedTimeline(observable);
-    subscriptions.clear();
+    deactivate();
+    const timeRange = 10000;
+    timeline = new AnimatedTimeline(observable, timeRange);
+    timeline.start();
     subscriptions.add(observable, (value) => {
-        const timestamp = moment().format('H:mm:ss');
-        $("#transcript").append(`<span class="timestamp">${timestamp}: </span><span class="value">${value}</span><br>`);
+        logToTranscript(value, "value");
     });
+    setTimeout(deactivate, timeRange);
+}
+
+export function logToTranscript(message: string, className: string = "message"): void {
+    const timestamp = moment().format('H:mm:ss');
+    $("#transcript").append(`<span class="timestamp">${timestamp}: </span><span class="${className}">${message}</span><br>`);
 }
 
 export function deactivate() {
     subscriptions.clear();
-    timeline.stop();
+    if (timeline) {
+        timeline.stop();
+    }
 }
 
 interface ITick {
@@ -49,7 +58,8 @@ class AnimatedTimeline {
     timeRange: number = 10000; // in ms
     dataPoints: ITick[] = [];
     subscription: Subscription;
-    constructor(observable: Observable<any>) {
+    constructor(observable: Observable<any>, timeRange: number) {
+        this.timeRange = timeRange;
         this.startTime = new Date().getTime();
         const canvas: HTMLCanvasElement = document.getElementById("canvas") as HTMLCanvasElement;
         if (!canvas) {
@@ -74,7 +84,7 @@ class AnimatedTimeline {
                 requestAnimationFrame(render);
             } else {
                 this.subscription.unsubscribe();
-                $("#transcript").append("<span>Stopped animation.</span><br>");
+                logToTranscript("Stopped animation.");
             }
         }
         render();
@@ -116,13 +126,5 @@ class AnimatedTimeline {
 
         this.context.fillStyle = 'red';
         this.context.fillRect(x, 0, 1, this.canvasHeight);
-        if (timeDelta > this.timeRange) {
-            this.running = false;
-        }
     }
-}
-
-function startAnimatedTimeline(observable: Observable<any>) {
-    timeline = new AnimatedTimeline(observable);
-    timeline.start();
 }
