@@ -2,6 +2,8 @@ import { from, Observable, of, timer } from "rxjs";
 import { flatMap, delay, delayWhen } from "rxjs/operators";
 import { activate } from "./activate";
 
+// const myTimer = timer(1000, 500);
+
 const parent: Observable<number> = from([1, 2, 3, 4]);
 const child: Observable<number> = parent
     .pipe(delayWhen((value) => timer(value * 1000)));

@@ -22,7 +22,7 @@ class Subscriptions {
 const subscriptions = new Subscriptions();
 let timelines: AnimatedTimeline[] = [];
 let timeOutId;
-export function activate(...observables: Array<Observable<any>>): void {
+export function activate(...things: Array<Observable<any> | AnimatedTimeline>): void {
     const colors = [
         'rgb(130, 215, 54)',
         'rgb(255, 105, 70)',
@@ -33,15 +33,25 @@ export function activate(...observables: Array<Observable<any>>): void {
     $("#canvas-pane").html("");
     clearTranscript();
     const timeRange = 10000;
-    for (let i = 0; i < observables.length; i++) {
-        const observable = observables[i];
-        const color = colors[i % colors.length];
-        const timeline = new AnimatedTimeline(observable, timeRange, color);
-        timeline.start();
-        timelines.push(timeline);
-        subscriptions.add(observable, (value) => {
-            logToTranscript(value, color);
-        });
+    for (let i = 0; i < things.length; i++) {
+        const thing = things[i];
+        if (thing instanceof Observable) {
+            const observable = thing as Observable<any>;
+            const color = colors[i % colors.length];
+            const timeline = new AnimatedTimeline(color, timeRange);
+            timeline.install();
+            timeline.start();
+            timelines.push(timeline);
+            subscriptions.add(observable, (value) => {
+                logToTranscript(value, color);
+                timeline.addValue(value);
+            });
+        } else if (thing instanceof AnimatedTimeline) {
+            const timeline = thing as AnimatedTimeline;
+            timeline.install();
+            timeline.start();
+            timelines.push(timeline);
+        }
     }
     timeOutId = setTimeout(deactivate, timeRange);
 }
@@ -50,7 +60,7 @@ export function clearTranscript(): void {
     $("#transcript").html("");
 }
 
-export function logToTranscript(message: string, color: string = "black"): void {
+export function logToTranscript(message: string, color: string = "inherit"): void {
     const timestamp = moment().format('H:mm:ss');
     $("#transcript").append(`<span class="timestamp">${timestamp}: </span><span class="value" style="background-color: ${color}">${message}</span><br>`);
 }
@@ -73,20 +83,22 @@ interface ITick {
     value: any
 }
 
-class AnimatedTimeline {
+export class AnimatedTimeline {
     context: CanvasRenderingContext2D;
     canvasWidth: number = 792;
     canvasHeight: number = 60;
     running: boolean = true;
     startTime: number;
-    timeRange: number = 10000; // in ms
+    timeRange: number; // in ms
     dataPoints: ITick[] = [];
-    subscription: Subscription;
     color: string;
-    constructor(observable: Observable<any>, timeRange: number, color: string) {
+    constructor(color: string, timeRange: number = 10000) {
         this.timeRange = timeRange;
         this.color = color;
         this.startTime = new Date().getTime();
+    }
+
+    install(): void {
         const canvas: HTMLCanvasElement = document.createElement("canvas") as HTMLCanvasElement;
         canvas.width = this.canvasWidth;
         canvas.height = this.canvasHeight;
@@ -99,11 +111,12 @@ class AnimatedTimeline {
             throw new Error("Cannot create graphics context.");
         }
         this.context = context;
-        this.subscription = observable.subscribe((value) => {
-            const now = new Date().getTime();
-            const tick = now - this.startTime;
-            this.dataPoints.push({ tick, value });
-        });
+    }
+
+    addValue(value: any): void {
+        const now = new Date().getTime();
+        const tick = now - this.startTime;
+        this.dataPoints.push({ tick, value });
     }
 
     start(): void {
@@ -111,8 +124,6 @@ class AnimatedTimeline {
             this.render();
             if (this.running) {
                 requestAnimationFrame(render);
-            } else {
-                this.subscription.unsubscribe();
             }
         }
         render();

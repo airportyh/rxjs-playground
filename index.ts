@@ -16,11 +16,6 @@ import "./10-from-event";
 import "./11-distinct-until-changed";
 import "./12-throttle";
 import "./13-debounce";
-// import "./exercise";
-
-// $("#clear-transcript").on("click", () => {
-//     $("#transcript").html("");
-// });
-
-// $("#deactivate").on("click", () => deactivate());
-
+import "./14-cold";
+import "./15-ajax";
+import "./16-ajax-multiple-observers";
